@@ -30,7 +30,7 @@ The solution is hosted on [GitHub](https://github.com/chegde20121/Tigerhall-Kitt
 
 
 ## Project Structure
-
+```
 tigerhall-kittens/
 |-- docs/                      # Swagger docs
 |-- internal/app/
@@ -75,8 +75,9 @@ tigerhall-kittens/
    ./scripts/deploy.sh [options]
 
 3. Available options are as below
- Option	Description
- -notest	Skip running tests.
- -build	Skip tests and only build the project.
- -run	Skip tests and only run the server.
- -shutdown	Gracefully shutdown the running server.
+| Option      | Description                                      |
+|-------------|--------------------------------------------------|
+| -notest     | Skip running tests.                              |
+| -build      | Skip tests and only build the project.           |
+| -run        | Skip tests and only run the server.              |
+| -shutdown   | Gracefully shutdown the running server.          |
