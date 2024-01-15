@@ -63,7 +63,7 @@ tigerhall-kittens/
 |-- go.mod
 |-- go.sum
 |-- README.md
-
+```
 ## How to Run
 
 ### Using deploy.sh Script
@@ -73,7 +73,7 @@ tigerhall-kittens/
 
    ```bash
    ./scripts/deploy.sh [options]
-
+   ```
 3. Available options are as below
 | Option      | Description                                      |
 |-------------|--------------------------------------------------|
@@ -81,3 +81,18 @@ tigerhall-kittens/
 | -build      | Skip tests and only build the project.           |
 | -run        | Skip tests and only run the server.              |
 | -shutdown   | Gracefully shutdown the running server.          |
+
+
+## Server Configuration
+
+| Server Name | Port   | Swagger URL                                      |
+|-------------|--------|--------------------------------------------------|
+| localhost | 8888   | http://localhost:8888/swagger/index.html           |
+
+
+## Pending Tasks
+- [ ] Start server in https mode.
+- [ ] Refactor code for better modularity.
+- [ ] Write comprehensive unit tests.
+- [ ] Update documentation for API endpoints.
+- [ ] Enhance error handling and logging.
