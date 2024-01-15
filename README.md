@@ -66,6 +66,34 @@ tigerhall-kittens/
 ```
 ## How to Run
 
+### Environment configurations
+Update .env files before running the application.
+
+#### Environment Variables
+
+| Variable                 | Description                                             |
+|--------------------------|---------------------------------------------------------|
+| POSTGRES_USER            | PostgreSQL username                                     |
+| POSTGRES_PASSWORD        | PostgreSQL password                                     |
+| POSTGRES_DB              | PostgreSQL database name                                |
+| POSTGRES_HOST            | PostgreSQL server host                                  |
+| POSTGRES_PORT            | PostgreSQL server port                                  |
+| POSTGRES_SSL             | PostgreSQL SSL mode (e.g., 'disable')                   |
+| POSTGRES_TIMEZONE        | PostgreSQL server timezone                              |
+| POSTGRES_SCHEMA          | PostgreSQL schema name                                  |
+| MIGRATION_FILES          | Path to general migration files                         |
+| MIGRATION_FILES_DB       | Path to database-specific migration files               |
+| MIGRATION_UP             | Perform database migrations on startup (true/false)     |
+| PAGE_SIZE                | Default page size for paginated results                 |
+| MAX_EMAIL_GOROUTINES     | Maximum number of goroutines for email sending          |
+| SENDER_EMAIL             | Sender email address for outgoing emails                |
+| SENDER_EMAIL_PASSWORD    | Password for the sender email account                   |
+| SMTP_HOST                | SMTP server host for email sending                      |
+| SMTP_PORT                | SMTP server port for email sending                      |
+
+*Note: Replace the placeholder values with your actual configuration. Ensure sensitive information like passwords is kept secure and not disclosed in the README.*
+
+
 ### Using deploy.sh Script
 1. Navigate to the project root directory.
 
