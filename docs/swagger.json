@@ -1,0 +1,605 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Users can use a fictional mobile app to add sightings of tigers in the wild.",
+        "title": "TigerHall Kittens",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8888",
+    "paths": {
+        "/api/v1/createSights": {
+            "post": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "description": "Create a new tiger sighting with the provided information.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sighting"
+                ],
+                "summary": "Create a new tiger sighting",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name of the tiger",
+                        "name": "tiger_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Timestamp of the sighting (unix epoch utc format example:1705147765)",
+                        "name": "last_seen_timestamp",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Latitude of the sighting coordinates",
+                        "name": "last_seen_coordinates_lat",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Longitude of the sighting coordinates",
+                        "name": "last_seen_coordinates_lon",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image of the sighting",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SightingsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/createTigers": {
+            "post": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "description": "Create a new tiger using either JSON or multipart form data",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tiger"
+                ],
+                "summary": "Create a new tiger",
+                "parameters": [
+                    {
+                        "description": "Create Tiger",
+                        "name": "tiger",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateTigerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateTigerRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/listTigers": {
+            "get": {
+                "description": "Retrieve a list of tigers with optional pagination.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tiger"
+                ],
+                "summary": "List all tigers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Number of tigers per page",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TigersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "description": "Log in a user with the provided credentials",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Log in a user",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user credentials",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to log in. Please try again",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Logout the authenticated user and invalidate the session",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Logout the authenticated user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GeneralResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "description": "Create a new user with the input paylod",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "Create user",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create user. Please try again",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tigers/:id/listSightings": {
+            "get": {
+                "description": "Get a paginated list of all sightings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sighting"
+                ],
+                "summary": "List all sightings",
+                "operationId": "list-tiger-sightings",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tiger ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of sightings to retrieve per page",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset for paginating the list",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of sightings",
+                        "schema": {
+                            "$ref": "#/definitions/models.SightingsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.CreateTigerRequest": {
+            "type": "object",
+            "properties": {
+                "date_of_birth": {
+                    "description": "Date of Birth of the tiger\n\nRequired: true\nExample: \"18/02/1998\"",
+                    "type": "string"
+                },
+                "last_coordinates": {
+                    "description": "Last coordinates where the tiger was seen\n\nRequired: true",
+                    "type": "object",
+                    "properties": {
+                        "last_seen_coordinates_lat": {
+                            "description": "Latitude of the last seen coordinates\n\nRequired: true\nExample: 37.7749",
+                            "type": "number"
+                        },
+                        "last_seen_coordinates_lon": {
+                            "description": "Longitude of the last seen coordinates\n\nRequired: true\nExample: -122.4194",
+                            "type": "number"
+                        }
+                    }
+                },
+                "last_seen_timestamp": {
+                    "description": "Last seen timestamp of the tiger in Unix Epoch Time UTC format\n\nRequired: true\nExample: 1705147765",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name of the tiger\n\nRequired: true\nExample: RajahuliBangalore",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Credentials": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "Password of the user.\nrequired: true\nexample: MySecretPassword\nmin length: 6",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Username of the user.\nrequired: true\nexample: john_doe",
+                    "type": "string"
+                }
+            }
+        },
+        "models.CustomTime": {
+            "type": "object",
+            "properties": {
+                "time.Time": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.GeneralResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Sighting": {
+            "type": "object",
+            "properties": {
+                "encoded_image": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "last_coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "last_seen_coordinates_lat": {
+                            "type": "number"
+                        },
+                        "last_seen_coordinates_lon": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "last_seen_timestamp": {
+                    "$ref": "#/definitions/models.UnixTime"
+                },
+                "sighting_id": {
+                    "type": "integer"
+                },
+                "tiger_id": {
+                    "type": "integer"
+                },
+                "tigername": {
+                    "type": "string"
+                },
+                "user": {
+                    "description": "Relationship with the user who reported the sighting",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    ]
+                }
+            }
+        },
+        "models.SightingsResponse": {
+            "type": "object",
+            "properties": {
+                "offset": {
+                    "description": "Offset for paginating through the list of sightings\n\nrequired: true\nexample: 0",
+                    "type": "integer"
+                },
+                "sightings": {
+                    "description": "List of sightings\n\nrequired: true",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Sighting"
+                    }
+                }
+            }
+        },
+        "models.Tiger": {
+            "type": "object",
+            "required": [
+                "date_of_birth",
+                "last_coordinates",
+                "last_seen_timestamp",
+                "name"
+            ],
+            "properties": {
+                "date_of_birth": {
+                    "description": "Example: \"18/02/1998\"",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CustomTime"
+                        }
+                    ]
+                },
+                "last_coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "last_seen_coordinates_lat": {
+                            "type": "number"
+                        },
+                        "last_seen_coordinates_lon": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "last_seen_timestamp": {
+                    "description": "Example: \"1705147765\"",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.UnixTime"
+                        }
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TigersResponse": {
+            "type": "object",
+            "properties": {
+                "offset": {
+                    "description": "Offset is the offset for paginating the list.",
+                    "type": "integer"
+                },
+                "tigers": {
+                    "description": "Tigers is the list of tigers.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Tiger"
+                    }
+                }
+            }
+        },
+        "models.UnixTime": {
+            "type": "object",
+            "properties": {
+                "time.Time": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "description": "Email of user\nswagger:meta\nin: body\nrequired: true",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Password of user\nswagger:meta\nin: body\nrequired: true",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Name of user\nswagger:meta\nin: body\nrequired: true",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Authorization": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
