@@ -1,0 +1,445 @@
+definitions:
+  models.CreateTigerRequest:
+    properties:
+      date_of_birth:
+        description: |-
+          Date of Birth of the tiger
+
+          Required: true
+          Example: "18/02/1998"
+        type: string
+      last_coordinates:
+        description: |-
+          Last coordinates where the tiger was seen
+
+          Required: true
+        properties:
+          last_seen_coordinates_lat:
+            description: |-
+              Latitude of the last seen coordinates
+
+              Required: true
+              Example: 37.7749
+            type: number
+          last_seen_coordinates_lon:
+            description: |-
+              Longitude of the last seen coordinates
+
+              Required: true
+              Example: -122.4194
+            type: number
+        type: object
+      last_seen_timestamp:
+        description: |-
+          Last seen timestamp of the tiger in Unix Epoch Time UTC format
+
+          Required: true
+          Example: 1705147765
+        type: integer
+      name:
+        description: |-
+          Name of the tiger
+
+          Required: true
+          Example: RajahuliBangalore
+        type: string
+    type: object
+  models.Credentials:
+    properties:
+      password:
+        description: |-
+          Password of the user.
+          required: true
+          example: MySecretPassword
+          min length: 6
+        type: string
+      username:
+        description: |-
+          Username of the user.
+          required: true
+          example: john_doe
+        type: string
+    type: object
+  models.CustomTime:
+    properties:
+      time.Time:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  models.GeneralResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.LoginResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+    type: object
+  models.Sighting:
+    properties:
+      encoded_image:
+        type: string
+      image:
+        items:
+          type: integer
+        type: array
+      last_coordinates:
+        properties:
+          last_seen_coordinates_lat:
+            type: number
+          last_seen_coordinates_lon:
+            type: number
+        type: object
+      last_seen_timestamp:
+        $ref: '#/definitions/models.UnixTime'
+      sighting_id:
+        type: integer
+      tiger_id:
+        type: integer
+      tigername:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationship with the user who reported the sighting
+    type: object
+  models.SightingsResponse:
+    properties:
+      offset:
+        description: |-
+          Offset for paginating through the list of sightings
+
+          required: true
+          example: 0
+        type: integer
+      sightings:
+        description: |-
+          List of sightings
+
+          required: true
+        items:
+          $ref: '#/definitions/models.Sighting'
+        type: array
+    type: object
+  models.Tiger:
+    properties:
+      date_of_birth:
+        allOf:
+        - $ref: '#/definitions/models.CustomTime'
+        description: 'Example: "18/02/1998"'
+      last_coordinates:
+        properties:
+          last_seen_coordinates_lat:
+            type: number
+          last_seen_coordinates_lon:
+            type: number
+        type: object
+      last_seen_timestamp:
+        allOf:
+        - $ref: '#/definitions/models.UnixTime'
+        description: 'Example: "1705147765"'
+      name:
+        type: string
+    required:
+    - date_of_birth
+    - last_coordinates
+    - last_seen_timestamp
+    - name
+    type: object
+  models.TigersResponse:
+    properties:
+      offset:
+        description: Offset is the offset for paginating the list.
+        type: integer
+      tigers:
+        description: Tigers is the list of tigers.
+        items:
+          $ref: '#/definitions/models.Tiger'
+        type: array
+    type: object
+  models.UnixTime:
+    properties:
+      time.Time:
+        type: string
+    type: object
+  models.User:
+    properties:
+      email:
+        description: |-
+          Email of user
+          swagger:meta
+          in: body
+          required: true
+        type: string
+      password:
+        description: |-
+          Password of user
+          swagger:meta
+          in: body
+          required: true
+        type: string
+      username:
+        description: |-
+          Name of user
+          swagger:meta
+          in: body
+          required: true
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+host: localhost:8888
+info:
+  contact: {}
+  description: Users can use a fictional mobile app to add sightings of tigers in
+    the wild.
+  title: TigerHall Kittens
+  version: "1.0"
+paths:
+  /api/v1/createSights:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new tiger sighting with the provided information.
+      parameters:
+      - description: Name of the tiger
+        in: formData
+        name: tiger_name
+        required: true
+        type: string
+      - description: Timestamp of the sighting (unix epoch utc format example:1705147765)
+        in: formData
+        name: last_seen_timestamp
+        required: true
+        type: string
+      - description: Latitude of the sighting coordinates
+        in: formData
+        name: last_seen_coordinates_lat
+        required: true
+        type: number
+      - description: Longitude of the sighting coordinates
+        in: formData
+        name: last_seen_coordinates_lon
+        required: true
+        type: number
+      - description: Image of the sighting
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SightingsResponse'
+        "400":
+          description: Invalid input format
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Authorization: []
+      summary: Create a new tiger sighting
+      tags:
+      - Sighting
+  /api/v1/createTigers:
+    post:
+      consumes:
+      - application/json
+      description: Create a new tiger using either JSON or multipart form data
+      parameters:
+      - description: Create Tiger
+        in: body
+        name: tiger
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTigerRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CreateTigerRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Authorization: []
+      summary: Create a new tiger
+      tags:
+      - Tiger
+  /api/v1/listTigers:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of tigers with optional pagination.
+      parameters:
+      - description: Number of tigers per page
+        in: query
+        name: pageSize
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TigersResponse'
+        "400":
+          description: Invalid input format
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List all tigers
+      tags:
+      - Tiger
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Log in a user with the provided credentials
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid user credentials
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to log in. Please try again
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Log in a user
+      tags:
+      - User
+  /api/v1/logout:
+    get:
+      description: Logout the authenticated user and invalidate the session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout the authenticated user
+      tags:
+      - User
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the input paylod
+      parameters:
+      - description: Create user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to create user. Please try again
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new user
+      tags:
+      - User
+  /api/v1/tigers/:id/listSightings:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of all sightings
+      operationId: list-tiger-sightings
+      parameters:
+      - description: Tiger ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Number of sightings to retrieve per page
+        in: query
+        name: pageSize
+        type: integer
+      - description: Offset for paginating the list
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of sightings
+          schema:
+            $ref: '#/definitions/models.SightingsResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List all sightings
+      tags:
+      - Sighting
+securityDefinitions:
+  Authorization:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
