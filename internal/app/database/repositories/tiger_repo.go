@@ -93,12 +93,14 @@ func (tr *TigerRepository) FetchTigersAndStore(pageSize int, offset int, cacheKe
 		return nil, err
 	}
 	tr.CacheMutex.Lock()
-	tigersCache.Set(cacheKey, cachedResult{
-		tigers:     tigers,
-		offset:     nextOffset,
-		expiryTime: time.Now().Add(tr.CacheExpiry),
-	}, cache.DefaultExpiration)
-	tr.CacheMutex.Unlock()
+	if len(tigers) > 0 {
+		tigersCache.Set(cacheKey, cachedResult{
+			tigers:     tigers,
+			offset:     nextOffset,
+			expiryTime: time.Now().Add(tr.CacheExpiry),
+		}, cache.DefaultExpiration)
+		tr.CacheMutex.Unlock()
+	}
 	tr.logger.Infof("Fetched %v tigers from database", len(tigers))
 	return &models.TigersResponse{Tigers: tigers, Offset: nextOffset}, nil
 }

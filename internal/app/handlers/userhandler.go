@@ -27,7 +27,7 @@ func (uh *UserHandler) RegisterUsers(rw http.ResponseWriter, req *http.Request) 
 }
 
 func (uh *UserHandler) Login(rw http.ResponseWriter, req *http.Request) {
-	uh.logger.Info("Registering user.....")
+	uh.logger.Info("Login user.....")
 	userService := service.NewUserService(uh.logger, database.GetDB())
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()

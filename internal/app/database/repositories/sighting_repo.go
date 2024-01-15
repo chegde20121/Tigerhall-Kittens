@@ -89,7 +89,7 @@ func (r *SightingRepository) GetPreviousSightingCoordinates(tigerID int) (struct
 }
 
 func (sr *SightingRepository) ListSightings(tigerId int, pageSize int, offset int) (*models.SightingsResponse, error) {
-	cacheKey := sr.generateCacheKey(pageSize, offset)
+	cacheKey := sr.generateCacheKey(tigerId, pageSize, offset)
 	sr.CacheMutex.RLock()
 	result, found := sightingCache.Get(cacheKey)
 	sr.CacheMutex.RUnlock()
@@ -112,12 +112,14 @@ func (sr *SightingRepository) FetchSightingsAndStore(tigerId int, pageSize int, 
 		return nil, err
 	}
 	sr.CacheMutex.Lock()
-	sightingCache.Set(cacheKey, cachedSighitingResult{
-		sightings:  sightings,
-		nextOffset: nextOffset,
-		expiryTime: time.Now().Add(sr.CacheExpiry),
-	}, cache.DefaultExpiration)
-	sr.CacheMutex.Unlock()
+	if len(sightings) > 0 {
+		sightingCache.Set(cacheKey, cachedSighitingResult{
+			sightings:  sightings,
+			nextOffset: nextOffset,
+			expiryTime: time.Now().Add(sr.CacheExpiry),
+		}, cache.DefaultExpiration)
+		sr.CacheMutex.Unlock()
+	}
 	sr.logger.Infof("Fetched %v sightings from database", len(sightings))
 	return &models.SightingsResponse{Sightings: sightings, Offset: nextOffset}, nil
 }
@@ -162,7 +164,7 @@ func (sr *SightingRepository) FetchFromDatabase(tigerId, pageSize int, offset in
 	return sightings, nextOffset, nil
 }
 
-func (sr *SightingRepository) generateCacheKey(pageSize int, offset int) string {
+func (sr *SightingRepository) generateCacheKey(tiger_id int, pageSize int, offset int) string {
 	// Customize the cache key based on your specific requirements
-	return "list_sightings:" + strconv.Itoa(pageSize) + ":" + fmt.Sprint(offset)
+	return "list_sightings:" + "tiger_id:" + strconv.Itoa(tiger_id) + ":" + strconv.Itoa(pageSize) + ":" + fmt.Sprint(offset)
 }
